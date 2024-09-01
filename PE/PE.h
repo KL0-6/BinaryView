@@ -5,6 +5,10 @@
 
 #pragma once
 #include <cstdint>
+#include <fstream>
+#include <vector>
+#include <imgui.h> 
+#include <inttypes.h>
 
 // MS Dos headers, most of the fields here are unused by modern Windows. Only exists for compatability. 
 typedef struct _IMAGE_DOS_HEADER 
@@ -29,6 +33,23 @@ typedef struct _IMAGE_DOS_HEADER
     uint16_t e_res2[10];   /* 28: Reserved words */
     uint32_t e_lfanew;     /* 3c: Offset to extended header (Usually NT Headers) */
 } IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;
+
+typedef struct _IMAGE_SECTION_HEADER 
+{
+    uint8_t Name[8];                  // 00: Section name
+    union {
+        uint32_t PhysicalAddress;
+        uint32_t VirtualSize;
+    } Misc;                            // 08: Physical address / Virtual size
+    uint32_t VirtualAddress;           // 0C: Virtual address
+    uint32_t SizeOfRawData;            // 10: Size of raw data in the file
+    uint32_t PointerToRawData;         // 14: File pointer to raw data
+    uint32_t PointerToRelocations;     // 18: File pointer to relocations
+    uint32_t PointerToLinenumbers;     // 1C: File pointer to line numbers
+    uint16_t NumberOfRelocations;      // 20: Number of relocations
+    uint16_t NumberOfLinenumbers;      // 22: Number of line numbers
+    uint32_t Characteristics;          // 24: Characteristics of the section
+} IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
 
 // Constants https://learn.microsoft.com/en-us/windows/win32/debug/pe-format
 enum class MachineArc : uint16_t
@@ -76,10 +97,78 @@ typedef struct _IMAGE_FILE_HEADER
     uint16_t Characteristics;
 } IMAGE_FILE_HEADER, *PIMAGE_FILE_HEADER;
 
+typedef struct _IMAGE_OPTIONAL_HEADER64 
+{
+    uint16_t Magic;
+    uint8_t MajorLinkerVersion;
+    uint8_t MinorLinkerVersion;
+    uint32_t SizeOfCode;
+    uint32_t SizeOfInitializedData;
+    uint32_t SizeOfUninitializedData;
+    uint32_t AddressOfEntryPoint;
+    uint32_t BaseOfCode;
+    uint64_t ImageBase;
+    uint32_t SectionAlignment;
+    uint32_t FileAlignment;
+    uint16_t MajorOperatingSystemVersion;
+    uint16_t MinorOperatingSystemVersion;
+    uint16_t MajorImageVersion;
+    uint16_t MinorImageVersion;
+    uint16_t MajorSubsystemVersion;
+    uint16_t MinorSubsystemVersion;
+    uint32_t Win32VersionValue;
+    uint32_t SizeOfImage;
+    uint32_t SizeOfHeaders;
+    uint32_t CheckSum;
+    uint16_t Subsystem;
+    uint16_t DllCharacteristics;
+    uint64_t SizeOfStackReserve;
+    uint64_t SizeOfStackCommit;
+    uint64_t SizeOfHeapReserve;
+    uint64_t SizeOfHeapCommit;
+    uint32_t LoaderFlags;
+    uint32_t NumberOfRvaAndSizes;
+    struct {
+        uint32_t VirtualAddress;
+        uint32_t Size;
+    } DataDirectory[16];
+} IMAGE_OPTIONAL_HEADER64, *PIMAGE_OPTIONAL_HEADER64;
+
 // PE structure 
 typedef struct _IMAGE_NT_HEADERS
 {
-  uint32_t Signature;                      /*00: PE Signature */
-  IMAGE_FILE_HEADER FileHeader;                 /*02: Attributes */
-  //IMAGE_OPTIONAL_HEADER64 OptionalHeader;
+    uint32_t Signature;                           /*00: PE Signature */
+    IMAGE_FILE_HEADER FileHeader;                 /*02: Attributes */
+    IMAGE_OPTIONAL_HEADER64 OptionalHeader;
 } IMAGE_NT_HEADERS, *PIMAGE_NT_HEADERS;
+
+#define IMAGE_SCN_MEM_DISCARDABLE		0x02000000
+#define IMAGE_SCN_MEM_NOT_CACHED		0x04000000
+#define IMAGE_SCN_MEM_NOT_PAGED			0x08000000
+#define IMAGE_SCN_MEM_SHARED			0x10000000
+#define IMAGE_SCN_MEM_EXECUTE			0x20000000
+#define IMAGE_SCN_MEM_READ			    0x40000000
+#define IMAGE_SCN_MEM_WRITE			    0x80000000
+
+class PE 
+{
+public:
+    PE(std::fstream& file) : file_(file) {}
+
+    const char* get_arc_name(MachineArc);
+    IMAGE_DOS_HEADER* get_dos();
+    IMAGE_NT_HEADERS* get_nt();
+    std::vector<IMAGE_SECTION_HEADER> get_sections();
+    std::vector<std::string> get_rdata_strings();
+
+    void render_sidebar();
+    void render_main();
+
+private:
+    IMAGE_DOS_HEADER* dos = nullptr;
+    IMAGE_NT_HEADERS* nt  = nullptr;
+    std::vector<IMAGE_SECTION_HEADER> sections;
+    std::vector<std::string> rdata_strings;
+
+    std::fstream& file_;
+};

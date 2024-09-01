@@ -15,7 +15,7 @@ BinaryView is a WIP binary file explorer created to help me learn about differen
 To build the project, ensure you have C++17 or higher and ImGui installed. Use CMake for building:
 
 ```bash
-git clone https://github.com/yourusername/BinaryView.git
+git clone https://github.com/KL0-6/BinaryView.git
 cd BinaryView
 mkdir build && cd build
 cmake ..
