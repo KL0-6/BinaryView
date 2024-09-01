@@ -6,6 +6,11 @@ BinaryView is a WIP binary file explorer created to help me learn about differen
 - **Learning-Oriented**: Designed as a learning tool for understanding executable structures.
 - **Cross-Platform**: Minimal dependencies, no reliance on platform-specific headers.
 
+## TODO
+- [ ] Implement UI
+- [ ] Allow modifications
+- [ ] ELF support
+
 ## Building
 To build the project, ensure you have C++17 or higher and ImGui installed. Use CMake for building:
 
