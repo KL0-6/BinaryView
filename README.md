@@ -2,6 +2,10 @@
 
 BinaryView is a WIP binary file explorer created to help me learn about different executable formats. Currently, it supports the Portable Executable (PE) format with the goal of expanding to support other formats such as ELF in the future.
 
+# Preview
+
+![preview](ui.png)
+
 ## Features
 - **Learning-Oriented**: Designed as a learning tool for understanding executable structures.
 - **Cross-Platform**: Minimal dependencies, no reliance on platform-specific headers.
