@@ -7,7 +7,7 @@ BinaryView is a WIP binary file explorer created to help me learn about differen
 - **Cross-Platform**: Minimal dependencies, no reliance on platform-specific headers.
 
 ## TODO
-- [ ] Implement UI
+- [X] Implement UI
 - [ ] Allow modifications
 - [ ] ELF support
 
